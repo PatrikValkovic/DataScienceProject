@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+    <title>DataScience project</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body>
+    <div class="container">
+
+
+
+        <h1>DataScience project</h1>
+
+        <div class="row">
+            <div class="col-12">
+                <br> {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %} {% if category == 'result': %}
+                <div class="alert alert-info">
+                    <strong>Success! </strong> {{ message }}
+                </div>
+                {% endif %} {% if category == 'error': %}
+                <div class="alert alert-warning">
+                    {{ message }}
+                </div>
+                {% endif %}
+
+                {% endfor %} {% endif %} {% endwith %}
+            </div>
+            <div class="col-12 col-lg-6">
+                <form action="" method="post" role="form">
+                    {{ form.csrf }}
+                    <div class="form-group">
+                        <label for="query">Search query:</label>
+                        <input type="text" class="form-control" id="query" name="query" placeholder="What are you looking for?">
+                        <label for="tweetsno">Number of tweets to search:</label>
+                        <input type="number" class="form-control" id="tweetsno" name="tweetsno" value="100">
+                        <div class="form-group" style="margin-top: 10px;">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="worldwide" name="worldwide">
+                                <label class="form-check-label" for="worldwide">
+                                    Search worldwide
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <!--
+                        <label for="datefrom">Date from:</label>
+                        <input type=datetime id="datefrom" name="datefrom"/>
+                        <label for="dateto">Date to:</label>
+                        <input type=datetime id="dateto" name="dateto" />
+                        -->
+
+                        <input type="hidden" name="latitude" value="38.92" id="LatitudeInput" />
+                        <input type="hidden" name="longitude" value="38.92" id="LongitudeInput" />
+                        <input type="hidden" name="radius" value="" id="RadiusInput" />
+
+                    </div>
+                    <button type="submit" class="btn btn-success form-control" id="SubmitButton">Submit</button>
+                </form>
+
+
+                <div class="list-group" style="margin-top: 20px">
+                    {% for w in words %}
+                        <a href="https://www.google.com/search?q={{w}}" class="list-group-item list-group-item-action" target="_blank">{{ w }}</a>
+                    {% endfor %}
+                </div>
+
+            </div>
+            <div class="col-12 col-lg-6">
+                <div id="map" style="width: 100%; height: 500px;"></div>
+            </div>
+        </div>
+
+
+
+
+
+
+    </div>
+<script>
+    var map;
+
+    function computeRadius(map) {
+        var bounds = map.getBounds();
+        // r = radius of the earth in km
+        var r = 6378.8;
+        // degrees to radians (divide by 57.2958)
+        var ne_lat = bounds.getNorthEast().lat() / 57.2958;
+        var ne_lng = bounds.getNorthEast().lng() / 57.2958;
+        var c_lat = bounds.getCenter().lat() / 57.2958;
+        var c_lng = bounds.getCenter().lng() / 57.2958;
+        // distance = circle radius from center to Northeast corner of bounds
+        var r_km = r * Math.acos(
+            Math.sin(c_lat) * Math.sin(ne_lat) +
+            Math.cos(c_lat) * Math.cos(ne_lat) * Math.cos(ne_lng - c_lng)
+        );
+        return r_km // radius in kms
+    }
+
+    function initMap() {
+        var longInput = document.getElementById('LongitudeInput');
+        var latInput = document.getElementById('LatitudeInput');
+        var radInput = document.getElementById('RadiusInput');
+        var submitButton = document.getElementById('SubmitButton');
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 42.1, lng: -78.36},
+            zoom: 4
+        });
+        map.center_changed = function () {
+            longInput.value = map.getCenter().lng();
+            latInput.value = map.getCenter().lat();
+            radInput.value = computeRadius(map);
+
+            console.log(map.getCenter().lng(), map.getCenter().lat(), map.getZoom());
+        };
+        var interval = setInterval(function(){
+            var radius = computeRadius(map);
+            if(radius){
+                radInput.value = radius;
+                clearInterval(interval);
+            }
+        }, 10);
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{MAP_KEY}}&callback=initMap" async defer></script>
+</body>
+</html>
