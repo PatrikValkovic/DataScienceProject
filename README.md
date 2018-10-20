@@ -22,7 +22,7 @@ For the running of the application, you will need the following tools and librar
 - *Python 3.6* programming environment, that can be downloaded from https://www.python.org/.
 - *Pip* package manager, that is usually installed with *Python 3.6*.
 
-Download the source code from Github here: https://github.com/PatrikValkovic/DataScienceProject.
+Download the source code from Github here: https://github.com/PatrikValkovic/WhatsUpTwitter.
 
 Install dependencies for the project with `pip install -r requiremnts.txt` command.
 
