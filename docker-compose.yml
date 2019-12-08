@@ -1,0 +1,9 @@
+version: '3'
+services:
+
+  whatsuptwitter:
+    image: patrikvalkovic/whatsuptwitter
+    working_dir: /project
+    command: ['python3', 'webapp.py']
+    ports:
+    - "6003:5000"
